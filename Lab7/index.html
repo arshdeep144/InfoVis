@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Lab 7 - Choropleth Maps and Color</title>
+  <meta charset="utf-8"/>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.4/lodash.min.js"></script>
+  <script src="https://d3js.org/topojson.v2.min.js"></script>
+
+  <style>
+  	/*CSS GOES HERE*/
+  	.counties {stroke: gray; fill: none; stroke-width: 0.5}
+  	.states {stroke: gold; fill: none}
+  </style>
+</head>
+
+<body>
+  <script>
+  	d3.json("us.json").then(function(us){ 
+  		d3.tsv("us-unemployment.tsv").then(function(data){ 
+  			ready(us, data); 
+  			function ready(us, data){ 
+  				var counties = topojson.feature(us, us.objects.counties).features;
+  				var states = topojson.mesh(us, us.objects.states, function(a, b) { 
+  					return a !== b; 
+  				}); 
+  				var svg = d3.select('body')
+	  				.append('svg')
+	  				.attr('width', 960)
+	  				.attr("height", 600);
+  				var geopath = d3.geoPath();
+  				var countyPaths = svg.append("g")
+  					.attr("class", "counties")
+  					.selectAll("path")
+  					.data(counties)
+  					.enter().append("path")
+  					.attr("d", geopath);
+  				svg.append("path")
+	  				.datum(states)
+	  				.attr("class", "states")
+	  				.attr("d", geopath);
+	  			var id2rate = {};
+	  			data.forEach(function(record){ 
+	  				id2rate[record.id] = +record.rate; 
+	  			});
+
+	     		var arrayOfColors = ['#E35B97','#BC5695','#94518D','#6E4B80','#4B426F','#2B385B'];
+		      	var color = d3.scaleLinear()
+		                    .domain([2,4,6,8])
+		                    .range(["brown", "steelblue"])
+		                    .interpolate(d3.interpolateHcl); 
+	  			countyPaths.style("fill", function(d){ return color(id2rate[d.id]); });
+	  			      var rainbow = d3.scaleSequential(d3.interpolateRainbow)
+                      .domain(d3.extent(data, function(d){return +d.rate})); // <- domain here as usual
+
+		      	var viridis = d3.scaleSequential(d3.interpolateViridis)
+		                      .domain(d3.extent(data, function(d){return +d.rate})); // <- domain here as usual
+
+		      	var magma = d3.scaleSequential(d3.interpolateMagma)
+		                      .domain(d3.extent(data, function(d){return +d.rate})); // <- domain here as usual
+
+		      	var plasma = d3.scaleSequential(d3.interpolateMagma)
+		                      .domain(d3.extent(data, function(d){return +d.rate})); // <- domain here as usual
+
+		      	countyPaths.style("fill", function(d) { 
+		        	return color(id2rate[d.id]);
+  				});
+  			}
+  		});
+  	});
+  </script>
+</body>
+
+</html>

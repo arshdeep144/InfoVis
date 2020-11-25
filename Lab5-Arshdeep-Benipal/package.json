@@ -1,0 +1,14 @@
+{
+  "name": "fe2be7b9d2d336be",
+  "main": "fe2be7b9d2d336be@517.js",
+  "version": "517.0.0",
+  "homepage": "https://observablehq.com/d/fe2be7b9d2d336be",
+  "author": {
+    "name": "Arshdeep Benipal",
+    "url": "https://observablehq.com/@arshdeep"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4"
+  }
+}

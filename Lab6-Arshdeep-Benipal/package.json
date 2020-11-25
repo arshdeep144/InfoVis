@@ -1,0 +1,14 @@
+{
+  "name": "@arshdeep/lab-6-time-oriented-data",
+  "main": "83c8539c9ae4e674@216.js",
+  "version": "216.0.0",
+  "homepage": "https://observablehq.com/@arshdeep/lab-6-time-oriented-data",
+  "author": {
+    "name": "Arshdeep Benipal",
+    "url": "https://observablehq.com/@arshdeep"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4"
+  }
+}

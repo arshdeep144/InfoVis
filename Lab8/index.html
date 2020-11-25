@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <title>Wordle</title>
+
+  <style>
+    path {fill: none; stroke: black;}
+    svg  {font-family: "Lato"}
+  </style>
+
+</head>
+
+<body>
+
+  <!-- These are the libraries you need. Above is the CSS. -->
+  <script src="data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/opentype.js@latest/dist/opentype.min.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+
+
+
+  <!-- Define an SVG element here. -->
+  <div id="scene">
+    <svg width="1200" height="900"></svg>
+  </div>
+
+  <script>
+
+        // The 'data' variable is defined in data.js and imported here. 
+        // You can use it freely anywhere.
+        // To iterate the words do:
+        //    for (word in data){}
+        // To get the frequency of a word:
+        //    data[word]
+        // To sort an array of words by frequency (after you have built that array!)
+        //    words.sort((w1, w2) => data[w2] - data[w1]);
+        // To get the array of frequency values (after buildind the array of words):
+        //    words.map((w) => data[w])
+        // To get a small subset of your array of words (testing purposes)
+        //    words.slice(0,10)  // the first 10, for instance
+
+
+    var x = 600;
+    var y = 450;
+    var fontUrl = 'https://fontlibrary.org/assets/fonts/lato/29e379a6ecc1b86c96931fa6ce4b3b0c/1233fdf19c04333c7f58af4eb8698452/LatoBlack.ttf';
+
+    opentype.load(fontUrl, function(err, font) {
+      if (err) {
+          alert('Could not load font: ' + err);
+      } else {
+
+        var words = [];
+        for (word in data) {
+          words.push(word);
+        }
+        words = words.sort((w1, w2) => data[w2] - data[w1]);
+        for (i in words){
+          console.log(words[i]);
+        }
+        var angle = 0.0;
+        var fontScale = d3.scaleLinear()
+        .domain(d3.extent(words.map((w) => data[w]).sort((w1, w2) => data[w2] - data[w1])))
+        .range([5, 25]);
+        //Quadtree to handle the grid
+        var quadtree = d3.quadtree();
+        var myText = d3.select("svg");
+        for (word in data){
+          console.log(word)
+          for (var i = 0; i < 720; i++){
+              //checks if the xy is in use if not then breaks
+              if (!quadtree.find(x, y, .1)) break;
+
+              // //Sets new xy
+              x=((1+angle)*Math.cos(angle)*100)%1200;
+              y=(((1+angle)*Math.sin(angle)*100)+100)%900;
+              angle = 0.1 * i;
+          }
+          quadtree.add([x, y]);
+
+          var matches = quadtree.find(x, y, .1);
+          console.log(matches);
+          console.log(word,data[word]);
+          console.log(fontScale(word));
+          var path = font.getPath(word, x, y, fontScale(word));
+
+          var d = path.toPathData(); // get d, a path descriptor
+
+          var pathNode = d3.select("#scene")
+          .append("path") // create a path
+          .attr("d", d) // set the value of d
+          .node();
+
+          // var pathLength = pathNode.getTotalLength();
+
+          // for (var j = 0; j < pathLength; j++) {
+          //   var point = pathNode.getPointAtLength(j);
+          //   point.x; // the x coordinate
+          //   point.y; // the y coordinate
+          // }
+          
+
+          //Adds the word to the svg with the new xy
+          myText.append("text")
+          .attr("x", x)
+          .attr("y", y)
+          .attr("width", x)
+          .attr("height", y)
+          .text(word)
+          .style("font-family", font)
+          .style("font-size", fontScale(word)); //this attribute isnt showing for all words?
+        }
+
+        quadtree.cover();
+      }
+});
+
+
+
+  </script>
+</body>
+</html>
